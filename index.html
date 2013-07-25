@@ -1,0 +1,13 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    <script type="text/javascript">
+        var id = parseInt(location.search.substring(1));
+        location.replace('https://github.com/abcrun/abcrun.github.com/issues' + (id ? '/' + id : '?labels=blog'));
+    </script>
+</body>
+</html>
