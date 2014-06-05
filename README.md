@@ -1,3 +1,3 @@
 #####Blog - Thanks Github
 
-abcrun.github.com
+<https://github.com/abcrun/abcrun.github.com/issues?labels=blog>
