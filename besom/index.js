@@ -270,8 +270,9 @@
         var p1 = distance(movetouches[1], starttouches[1]), rotatelength0 = p0.length, rotatelength1 = p1.length,
           rotatelength = rotatelength0 + rotatelength1, rvalue = (startlength*startlength + movelength*movelength - rotatelength*rotatelength)/(2*startlength*movelength),
           totalrotate = Math.acos(rvalue < -1 ? -1 : (rvalue > 1 ? 1 : rvalue))/toradian,
-          index = starttouches[0].pageY < starttouches[1].pageY ? 0 : 1, direction = movetouches[index].pageX - starttouches[index].pageX >= 0 ? 1 : -1,
-          rotate = direction * totalrotate;
+          //index = starttouches[0].pageY < starttouches[1].pageY ? 0 : 1, direction = movetouches[index].pageX - starttouches[index].pageX >= 0 ? 1 : -1,
+          rotate = totalrotate;
+        //rotate = direction * totalrotate;
 
         if(!name) name = enabled('pinch') && enabled('rotate') ? (Math.abs(scale - 1) > 0.02 ? 'pinch' : 'rotate') : (enabled('pinch') ? 'pinch' : 'rotate');
 
