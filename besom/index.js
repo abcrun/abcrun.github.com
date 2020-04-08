@@ -261,11 +261,15 @@
         name = 'slide';
       }else if(startInfo.count == 2 && moveInfo.count == 2){
         var startlength = startInfo.length, movelength = moveInfo.length, toradian = Math.PI/180, scale = movelength/startlength;
+
         var p1 = distance(movetouches[1], starttouches[1]), rotatelength0 = p0.length, rotatelength1 = p1.length,
           rotatelength = rotatelength0 + rotatelength1, rvalue = (startlength*startlength + movelength*movelength - rotatelength*rotatelength)/(2*startlength*movelength),
           rotate = Math.acos(rvalue < -1 ? -1 : (rvalue > 1 ? 1 : rvalue))/toradian;
 
-        document.getElementById('test').innerHTML = 'name:' + name + '---rotate:' + f3(rotate) + '--scale:' + f3(scale-1)
+        var halfstart = startlength/2, halfmove = movelength/2, nrvalue = (halfstart*halfstart + halfmove*halfmove - p0.length*p0.length)/2*halfstart*halfmove,
+          nrotate = Math.acos(nrvalue < -1 ? -1 : (nrvalue > 1 ? 1 : nrvalue))/toradian;
+
+        document.getElementById('test').innerHTML = nrotate;
 
         if(!name){
           if(enabled('pinch') && enabled('rotate')){
