@@ -261,19 +261,16 @@
         name = 'slide';
       }else if(startInfo.count == 2 && moveInfo.count == 2){
         var startlength = startInfo.length, movelength = moveInfo.length, toradian = Math.PI/180, scale = movelength/startlength;
-
-        var p1 = distance(movetouches[1], starttouches[1]), rotatelength0 = p0.length, rotatelength1 = p1.length,
-          rotatelength = rotatelength0 + rotatelength1, rvalue = (startlength*startlength + movelength*movelength - rotatelength*rotatelength)/(2*startlength*movelength),
+        var halfstart = startlength/2, halfmove = movelength/2, pd = p0.length, rvalue = (halfstart*halfstart + halfmove*halfmove - pd*pd)/(2*halfstart*halfmove),
           rotate = Math.acos(rvalue < -1 ? -1 : (rvalue > 1 ? 1 : rvalue))/toradian;
+        if(p0.offsetx < 0) rotate *= -1;
 
-        var halfstart = startlength/2, halfmove = movelength/2, pd = p0.length, nrvalue = (halfstart*halfstart + halfmove*halfmove - pd*pd)/(2*halfstart*halfmove),
-          nrotate = Math.acos(nrvalue < -1 ? -1 : (nrvalue > 1 ? 1 : nrvalue))/toradian;
 
-        document.getElementById('test').innerHTML = 'hahahhahaahaha-----------' + nrotate;
+        document.getElementById('test').innerHTML = '-----------' + rotate +  '#######' + p0.offsetx;
 
         if(!name){
           if(enabled('pinch') && enabled('rotate')){
-            if(Math.abs(scale - 1) > 0.02) name = 'pinch';
+            if(Math.abs(scale - 1) > 0.015) name = 'pinch';
             else if(Math.abs(rotate) > 1) name = 'rotate';
             else return;
           }else{
