@@ -246,12 +246,14 @@
   var bindEvent = function(){
     var that = this, elm = this.element;
     var enabled = function(g){ return that.enabled.indexOf(g) > -1 };
-    var name, mark;
+    var name, mark, preMove;
 
     var calculate = function(){
       if(!startInfo || !moveInfo) return;
 
       var starttouches = startInfo.events, movetouches = moveInfo.events, p0 = distance(starttouches[0], movetouches[0]);
+      if(!preMove) preMove = starttouches[0];
+
       if(startInfo.count == 1 && moveInfo.count == 1 && enabled('slide') && p0.length > 3){
         var offset = { x: p0.offsetx, y: p0.offsety };
         if(!mark) mark = { x: 0, y: 0 };
@@ -262,24 +264,11 @@
       }else if(startInfo.count == 2 && moveInfo.count == 2){
         var startlength = startInfo.length, movelength = moveInfo.length, toradian = Math.PI/180, scale = movelength/startlength;
         var halfstart = startlength/2, halfmove = movelength/2, pd = p0.length, rvalue = (halfstart*halfstart + halfmove*halfmove - pd*pd)/(2*halfstart*halfmove),
-          rotate = Math.acos(rvalue < -1 ? -1 : (rvalue > 1 ? 1 : rvalue))/toradian,
-          startTopIndex = starttouches[0].pageY < starttouches[1].pageY ? 0 : 1, direction = movetouches[startTopIndex].pageX > starttouches[startTopIndex].pageX ? 1 : -1,
-          rotate = rotate * direction;
+          totalrotate = Math.acos(rvalue < -1 ? -1 : (rvalue > 1 ? 1 : rvalue))/toradian,
+          center = startInfo.center, mcy = movetouches[0].pageY - center.pageY, mpx = movetouches[0].pageX - preMove.pageX,
+          rotate = mcy*mpx > 0 ? -rotate : rotate;
 
-
-        document.getElementById('test').innerHTML = '-----------' + rotate;
-
-        if(!name){
-          if(enabled('pinch') && enabled('rotate')){
-            if(Math.abs(scale - 1) > 0.015) name = 'pinch';
-            else if(Math.abs(rotate) > 1) name = 'rotate';
-            else return;
-          }else{
-            name = enabled('pinch') ? 'pinch' : 'rotate';
-          }
-        }
-
-        //if(!name) name = enabled('pinch') && enabled('rotate') ? (Math.abs(scale - 1) > 0.01 ? 'pinch' : 'rotate') : (enabled('pinch') ? 'pinch' : 'rotate');
+        if(!name) name = enabled('pinch') && enabled('rotate') ? (Math.abs(scale - 1) > totalrotate/360 ? 'pinch' : 'rotate') : (enabled('pinch') ? 'pinch' : 'rotate');
 
         if(name == 'pinch'){
           if(mark == undefined) mark = 1;
