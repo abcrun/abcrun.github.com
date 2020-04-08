@@ -268,10 +268,12 @@
           index = starttouches[0].pageY < starttouches[1].pageY ? 0 : 1, direction = movetouches[index].pageX - starttouches[index].pageX >= 0 ? 1 : -1,
           rotate = (totalrotate > 180 ? 180 : (totalrotate < -180 ? -180 : totalrotate)) * direction;
 
+        document.getElementById('test').innerHTML = 'totalRotate:' + totalrotate + '---direction:' + direction + '-------rotate:' + rotate
+
         if(!name){
           if(enabled('pinch') && enabled('rotate')){
             if(Math.abs(scale - 1) > 0.02) name = 'pinch';
-            else if(Math.abs(rotate) > 2) name = 'rotate';
+            else if(Math.abs(totalrotate) > 2) name = 'rotate';
             else return;
           }else{
             name = enabled('pinch') ? 'pinch' : 'rotate';
