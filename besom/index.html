@@ -31,7 +31,9 @@
       g.on('longtap', function(e){ console.log('parent longtap', e) })
 
       var px, py;
-      g.on('start', function(){console.log('parent start') })
+      g.on('start', function(e){
+        if(e.center) this.setPointAsOrigin(e.center);
+      })
       g.on('slide', function(c, a){
         this.translate(c.translate)
       })
