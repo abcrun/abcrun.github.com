@@ -263,7 +263,7 @@
         var startlength = startInfo.length, movelength = moveInfo.length, toradian = Math.PI/180, scale = movelength/startlength;
         var halfstart = startlength/2, halfmove = movelength/2, pd = p0.length, rvalue = (halfstart*halfstart + halfmove*halfmove - pd*pd)/(2*halfstart*halfmove),
           rotate = Math.acos(rvalue < -1 ? -1 : (rvalue > 1 ? 1 : rvalue))/toradian,
-          startTopIndex = starttouches[0].pageY < starttouches[1].pageY ? 0 : 1, direction = movetouches[startTopIndex].pageX > starttouches[startTopIndex] ? 1 : -1,
+          startTopIndex = starttouches[0].pageY < starttouches[1].pageY ? 0 : 1, direction = movetouches[startTopIndex].pageX > starttouches[startTopIndex].pageX ? 1 : -1,
           rotate = rotate * direction;
 
 
