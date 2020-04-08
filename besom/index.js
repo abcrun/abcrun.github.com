@@ -270,7 +270,7 @@
 
         preMove = movetouches[0];
 
-        document.getElementById('test').innerHTML = totalrotate + '------' + rotate + '--scale' + scale - 1
+        document.getElementById('test').innerHTML = '###############' + totalrotate + '------' + rotate + '--scale' + (scale - 1)
 
         if(!name) name = enabled('pinch') && enabled('rotate') ? (Math.abs(scale - 1) > totalrotate/360 ? 'pinch' : 'rotate') : (enabled('pinch') ? 'pinch' : 'rotate');
 
