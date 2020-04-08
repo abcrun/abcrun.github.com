@@ -266,7 +266,8 @@
           rotatelength = rotatelength0 + rotatelength1, rvalue = (startlength*startlength + movelength*movelength - rotatelength*rotatelength)/(2*startlength*movelength),
           totalrotate = Math.acos(rvalue < -1 ? -1 : (rvalue > 1 ? 1 : rvalue))/toradian,
           index = starttouches[0].pageY < starttouches[1].pageY ? 0 : 1, direction = movetouches[index].pageX - starttouches[index].pageX >= 0 ? 1 : -1,
-          rotate = direction * totalrotate;
+          rotate = (direction * totalrotate)%360;
+        rotate = rotate > 180 ? 180 : (rotate < -180 ? -180 : rotate);
 
         if(!name){
           if(enabled('pinch') && enabled('rotate')){
