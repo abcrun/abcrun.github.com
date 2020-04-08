@@ -13,7 +13,7 @@
       .span1{ top: 0; }
       .span2{ bottom: 0; }
 
-      #test{ font-size: 12px;background: #000; color: #fff; height: 20px; }
+      #test{ position:absolute; bottom: 0; width: 100%; font-size: 12px;background: #000; color: #fff; line-height: 20px; }
     </style>
   </head>
   <body>
@@ -24,7 +24,7 @@
     </div>
     <div id="test">
     </div>
-    <script charset="utf-8" src="./index.js?11"></script>
+    <script charset="utf-8" src="./index.js?22"></script>
     <script charset="utf-8">
       var g = Besom.create(document.getElementById('demo'));
       g.enable('longtap', 'slide', 'rotate', 'pinch');
