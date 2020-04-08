@@ -262,11 +262,12 @@
       }else if(startInfo.count == 2 && moveInfo.count == 2){
         var startlength = startInfo.length, movelength = moveInfo.length, toradian = Math.PI/180, scale = movelength/startlength;
         var halfstart = startlength/2, halfmove = movelength/2, pd = p0.length, rvalue = (halfstart*halfstart + halfmove*halfmove - pd*pd)/(2*halfstart*halfmove),
-          rotate = Math.acos(rvalue < -1 ? -1 : (rvalue > 1 ? 1 : rvalue))/toradian;
-        if(p0.offsetx * p0.offsety > 0) rotate *= -1;
+          rotate = Math.acos(rvalue < -1 ? -1 : (rvalue > 1 ? 1 : rvalue))/toradian,
+          startTopIndex = starttouches[0].pageY < starttouches[1].pageY ? 0 : 1, direction = movetouches[index].pageX > starttouches[index] ? 1 : -1,
+          rotate = rotate * direction;
 
 
-        document.getElementById('test').innerHTML = '-----------' + rotate +  '#######' + p0.offsetx;
+        document.getElementById('test').innerHTML = '-----------' + rotate;
 
         if(!name){
           if(enabled('pinch') && enabled('rotate')){
