@@ -156,7 +156,6 @@
         if(!increase) return;
 
         var scale = this.transform.scale.x, ns = increase*scale;
-        console.log(increase, scale)
         render.call(this, { scale: ns }, transition);
       },
       rotate: function(rotateangle, transition){
@@ -264,16 +263,14 @@
         var startlength = startInfo.length, movelength = moveInfo.length, toradian = Math.PI/180, scale = movelength/startlength;
         var p1 = distance(movetouches[1], starttouches[1]), rotatelength0 = p0.length, rotatelength1 = p1.length,
           rotatelength = rotatelength0 + rotatelength1, rvalue = (startlength*startlength + movelength*movelength - rotatelength*rotatelength)/(2*startlength*movelength),
-          totalrotate = Math.acos(rvalue < -1 ? -1 : (rvalue > 1 ? 1 : rvalue))/toradian,
-          index = starttouches[0].pageY < starttouches[1].pageY ? 0 : 1, direction = movetouches[index].pageX - starttouches[index].pageX >= 0 ? 1 : -1,
-          rotate = (totalrotate > 180 ? 180 : (totalrotate < -180 ? -180 : totalrotate)) * direction;
+          rotate = Math.acos(rvalue < -1 ? -1 : (rvalue > 1 ? 1 : rvalue))/toradian;
 
-        document.getElementById('test').innerHTML = 'name:' + name + '---rotate:' + f3(totalrotate) + '--direction:' + direction + '--scale:' + f3(scale-1)
+        document.getElementById('test').innerHTML = 'name:' + name + '---rotate:' + f3(rotate) + '--direction:' + direction + '--scale:' + f3(scale-1)
 
         if(!name){
           if(enabled('pinch') && enabled('rotate')){
             if(Math.abs(scale - 1) > 0.02) name = 'pinch';
-            else if(Math.abs(totalrotate) > 1) name = 'rotate';
+            else if(Math.abs(rotate) > 1) name = 'rotate';
             else return;
           }else{
             name = enabled('pinch') ? 'pinch' : 'rotate';
