@@ -156,6 +156,7 @@
         if(!increase) return;
 
         var scale = this.transform.scale.x, ns = increase*scale;
+        console.log(increase, scale)
         render.call(this, { scale: ns }, transition);
       },
       rotate: function(rotateangle, transition){
@@ -251,6 +252,7 @@
     var calculate = function(){
       if(!startInfo || !moveInfo) return;
 
+
       var starttouches = startInfo.events, movetouches = moveInfo.events, p0 = distance(starttouches[0], movetouches[0]);
       if(!preMove) preMove = starttouches[0];
 
@@ -263,16 +265,23 @@
         name = 'slide';
       }else if(startInfo.count == 2 && moveInfo.count == 2){
         var startlength = startInfo.length, movelength = moveInfo.length, toradian = Math.PI/180, scale = movelength/startlength;
-        var halfstart = startlength/2, halfmove = movelength/2, pd = p0.length, rvalue = (halfstart*halfstart + halfmove*halfmove - pd*pd)/(2*halfstart*halfmove),
+        var p1 = distance(movetouches[1], starttouches[1]), rotatelength0 = p0.length, rotatelength1 = p1.length,
+          rotatelength = rotatelength0 + rotatelength1, rvalue = (startlength*startlength + movelength*movelength - rotatelength*rotatelength)/(2*startlength*movelength),
           totalrotate = Math.acos(rvalue < -1 ? -1 : (rvalue > 1 ? 1 : rvalue))/toradian,
           center = startInfo.center, mcy = movetouches[0].pageY - center.pageY, mpx = movetouches[0].pageX - preMove.pageX,
           rotate = mcy*mpx > 0 ? -totalrotate : totalrotate;
 
-        preMove = movetouches[0];
+        if(!name){
+          if(enabled('pinch') && enabled('rotate')){
+            if(Math.abs(scale - 1) > 0.02) name = 'pinch';
+            else if(Math.abs(rotate) > 2) name = 'rotate';
+            else return;
+          }else{
+            name = enabled('pinch') ? 'pinch' : 'rotate';
+          }
+        }
 
-        document.getElementById('test').innerHTML = '###############' + totalrotate + '------' + rotate + '--scale' + (scale - 1)
-
-        if(!name) name = enabled('pinch') && enabled('rotate') ? (Math.abs(scale - 1) > totalrotate/360 ? 'pinch' : 'rotate') : (enabled('pinch') ? 'pinch' : 'rotate');
+        //if(!name) name = enabled('pinch') && enabled('rotate') ? (Math.abs(scale - 1) > 0.01 ? 'pinch' : 'rotate') : (enabled('pinch') ? 'pinch' : 'rotate');
 
         if(name == 'pinch'){
           if(mark == undefined) mark = 1;
@@ -282,6 +291,7 @@
           if(mark == undefined) mark = 0;
           moveInfo.rotate = rotate - mark;
           mark = rotate;
+          preMove = movetouches[0];
         }
       }
 
