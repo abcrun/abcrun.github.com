@@ -268,6 +268,8 @@
           center = startInfo.center, mcy = movetouches[0].pageY - center.pageY, mpx = movetouches[0].pageX - preMove.pageX,
           rotate = mcy*mpx > 0 ? -totalrotate : totalrotate;
 
+        preMove = movetouches[0];
+
         document.getElementById('test').innerHTML = totalrotate + '------' + rotate + '--scale' + scale - 1
 
         if(!name) name = enabled('pinch') && enabled('rotate') ? (Math.abs(scale - 1) > totalrotate/360 ? 'pinch' : 'rotate') : (enabled('pinch') ? 'pinch' : 'rotate');
@@ -342,6 +344,7 @@
       isanimation = false;
       name = undefined;
       mark = undefined;
+      preMove = undefined;
 
       elm.removeEventListener(istouch ? 'touchmove' : 'mousemove', move, false);
       elm.removeEventListener(istouch ? 'touchend' : 'mouseup', end, false)
