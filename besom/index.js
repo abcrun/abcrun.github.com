@@ -269,7 +269,7 @@
           rotatelength = rotatelength0 + rotatelength1, rvalue = (startlength*startlength + movelength*movelength - rotatelength*rotatelength)/(2*startlength*movelength),
           rotate = Math.acos(rvalue < -1 ? -1 : (rvalue > 1 ? 1 : rvalue))/toradian,
           center = startInfo.center, mcy = movetouches[0].pageY - center.pageY, mpx = movetouches[0].pageX - preMove.pageX;
-        if((mcy > 0 && mpx > 0) || (mcy < 0 && mcx < 0)) rotate = -rotate;
+        if((mcy > 0 && mpx > 0) || (mcy < 0 && mpx < 0)) rotate = -rotate;
 
         document.getElementById('test').innerHTML = '----' + f3(rotate) + '---mcy:' + f3(mcy) + '--mpx:' + f3(mpx);
         if(!name){
