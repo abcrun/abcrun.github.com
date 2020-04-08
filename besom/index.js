@@ -266,10 +266,10 @@
           rotatelength = rotatelength0 + rotatelength1, rvalue = (startlength*startlength + movelength*movelength - rotatelength*rotatelength)/(2*startlength*movelength),
           rotate = Math.acos(rvalue < -1 ? -1 : (rvalue > 1 ? 1 : rvalue))/toradian;
 
-        var halfstart = startlength/2, halfmove = movelength/2, nrvalue = (halfstart*halfstart + halfmove*halfmove - p0.length*p0.length)/2*halfstart*halfmove,
+        var halfstart = startlength/2, halfmove = movelength/2, pd = p0.length, nrvalue = (halfstart*halfstart + halfmove*halfmove - pd*pd)/(2*halfstart*halfmove),
           nrotate = Math.acos(nrvalue < -1 ? -1 : (nrvalue > 1 ? 1 : nrvalue))/toradian;
 
-        document.getElementById('test').innerHTML = nrotate;
+        document.getElementById('test').innerHTML = 'hahahhahaahaha-----------' + nrotate;
 
         if(!name){
           if(enabled('pinch') && enabled('rotate')){
