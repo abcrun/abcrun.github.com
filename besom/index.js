@@ -267,10 +267,11 @@
         var startlength = startInfo.length, movelength = moveInfo.length, toradian = Math.PI/180, scale = movelength/startlength;
         var p1 = distance(movetouches[1], starttouches[1]), rotatelength0 = p0.length, rotatelength1 = p1.length,
           rotatelength = rotatelength0 + rotatelength1, rvalue = (startlength*startlength + movelength*movelength - rotatelength*rotatelength)/(2*startlength*movelength),
-          totalrotate = Math.acos(rvalue < -1 ? -1 : (rvalue > 1 ? 1 : rvalue))/toradian,
-          center = startInfo.center, mcy = movetouches[0].pageY - center.pageY, mpx = movetouches[0].pageX - preMove.pageX,
-          rotate = mcy*mpx > 0 ? -totalrotate : totalrotate;
+          rotate = Math.acos(rvalue < -1 ? -1 : (rvalue > 1 ? 1 : rvalue))/toradian,
+          center = startInfo.center, mcy = movetouches[0].pageY - center.pageY, mpx = movetouches[0].pageX - preMove.pageX;
+        if((mcy > 0 && mpx > 0) || (mcy < 0 && mcx < 0)) rotate = -rotate;
 
+        document.getElementById('test').innerHTML = '----' + f3(rotate) + '---mcy:' + f3(mcy) + '--mpx:' + f3(mpx);
         if(!name){
           if(enabled('pinch') && enabled('rotate')){
             if(Math.abs(scale - 1) > 0.02) name = 'pinch';
@@ -280,8 +281,6 @@
             name = enabled('pinch') ? 'pinch' : 'rotate';
           }
         }
-
-        //if(!name) name = enabled('pinch') && enabled('rotate') ? (Math.abs(scale - 1) > 0.01 ? 'pinch' : 'rotate') : (enabled('pinch') ? 'pinch' : 'rotate');
 
         if(name == 'pinch'){
           if(mark == undefined) mark = 1;
