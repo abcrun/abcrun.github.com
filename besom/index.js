@@ -263,7 +263,7 @@
         var startlength = startInfo.length, movelength = moveInfo.length, toradian = Math.PI/180, scale = movelength/startlength;
         var halfstart = startlength/2, halfmove = movelength/2, pd = p0.length, rvalue = (halfstart*halfstart + halfmove*halfmove - pd*pd)/(2*halfstart*halfmove),
           rotate = Math.acos(rvalue < -1 ? -1 : (rvalue > 1 ? 1 : rvalue))/toradian;
-        if(p0.offsetx < 0) rotate *= -1;
+        if(p0.offsetx * p0.offsety > 0) rotate *= -1;
 
 
         document.getElementById('test').innerHTML = '-----------' + rotate +  '#######' + p0.offsetx;
