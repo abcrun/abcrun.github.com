@@ -268,7 +268,7 @@
           index = starttouches[0].pageY < starttouches[1].pageY ? 0 : 1, direction = movetouches[index].pageX - starttouches[index].pageX >= 0 ? 1 : -1,
           rotate = (totalrotate > 180 ? 180 : (totalrotate < -180 ? -180 : totalrotate)) * direction;
 
-        document.getElementById('test').innerHTML = 'rotate:' + f3(totalrotate) + '---direction:' + direction + '-------scale:' + (scale-1)
+        document.getElementById('test').innerHTML = 'name:' + name + '---rotate:' + f3(totalrotate) + '--direction:' + direction + '--scale:' + f3(scale-1)
 
         if(!name){
           if(enabled('pinch') && enabled('rotate')){
