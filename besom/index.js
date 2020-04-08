@@ -268,7 +268,7 @@
           center = startInfo.center, mcy = movetouches[0].pageY - center.pageY, mpx = movetouches[0].pageX - preMove.pageX,
           rotate = mcy*mpx > 0 ? -totalrotate : totalrotate;
 
-        document.getElemementById('test').innerHTML = totalrotate + '------' + rotate + '--scale' + scale - 1
+        document.getElementById('test').innerHTML = totalrotate + '------' + rotate + '--scale' + scale - 1
 
         if(!name) name = enabled('pinch') && enabled('rotate') ? (Math.abs(scale - 1) > totalrotate/360 ? 'pinch' : 'rotate') : (enabled('pinch') ? 'pinch' : 'rotate');
 
