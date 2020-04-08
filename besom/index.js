@@ -67,14 +67,14 @@
     //getTransform
     var getTransform = function(elm){
       var cssText = elm.style ? elm.style.cssText : '', transform;
-        rt = /translate\((.+)\)/i.exec(cssText) || [], rs = /scale\((.+)\)/i.exec(cssText) || [], rr = /rotate\((.+)\)/i.exec(cssText) || [], ro = /origin:([^;]+)/i.exec(cssText) || [];
+        rt = /translate\((.+)\)/i.exec(cssText) || [], rs = /scale\((.+)\)/i.exec(cssText) || [], rr = /rotate\((.+)\)/i.exec(cssText) || [], ro = /origin:\s*([^;]+)/i.exec(cssText) || [];
       if(rt.length && rs.length && rr.length && ro.length){
         var t = rt[1].split(','), s = rs[1], r = rr[1], o = ro[1].split(' ');
         transform = {
-          translate:{ x: parseInt(t[0]), y: parseInt(t[1]) },
-          scale: { x:parseInt(s), y:parseInt(s) },
-          rotate: parseInt(r),
-          origin: { x: parseInt(o[0]) , y: parseInt(o[1]) },
+          translate:{ x: f3(t[0]), y: f3(t[1]) },
+          scale: { x:f3(s), y:f3(s) },
+          rotate: f3(r),
+          origin: { x: f3(o[0]) , y: f3(o[1]) },
         }
       }else{
         var styles = window.getComputedStyle(elm, false),
@@ -90,10 +90,10 @@
     //render
     var render = function(opt, transition){
       var elm = this.element, cssText = elm.style.cssText || '', s = this.transform, transition = transition || '0s',
-        origin = opt.origin || s.origin, translate = opt.translate || s.translate, scale = opt.scale || s.scale.x, rotate = opt.rotate || s.rotate,
+        torigin = opt.origin || s.origin, translate = opt.translate || s.translate, scale = opt.scale || s.scale.x, rotate = opt.rotate || s.rotate,
         transition = '-webkit-transition:' + transition + ';',
         transform = '-webkit-transform: translate(' + f3(translate.x) + 'px, ' + f3(translate.y) + 'px) scale(' + f3(scale) + ') rotate(' + f3(rotate) + 'deg);',
-        origin = '-webkit-transform-origin:' + f3(origin.x) + 'px ' + f3(origin.y) + 'px;';
+        origin = '-webkit-transform-origin:' + f3(torigin.x) + 'px ' + f3(torigin.y) + 'px;';
 
       elm.style.cssText = cssText + ';' + transition + transform + origin;
     }
@@ -114,8 +114,8 @@
         return { left: left, top: top }
       },
       getPointOrigin: function(point){
-        var o = this.offset(), transform = this.transform, toradian = Math.PI/180,
-          origin = transform.origin, scale = transform.scale.x, rotate = transform.rotate, tx = transform.translate.x, ty = transform.translate.y,
+        var o = this.offset(), transform = this.transform, toradian = Math.PI/180, matrix = getMatrix(this.element), json = Matrix.parse(matrix),
+          origin = transform.origin, scale = transform.scale.x, rotate = transform.rotate, tx = json.translate.x, ty = json.translate.y,
           p = { x: point.pageX - o.left, y: point.pageY - o.top }, offsetx = origin.x - p.x, offsety = origin.y - p.y,
           point_origin_distance = Math.sqrt(offsetx*offsetx + offsety*offsety)/scale, angle = Math.atan(Math.abs(offsety/offsetx))/toradian, nx, ny;
 
@@ -156,6 +156,7 @@
         if(!increase) return;
 
         var scale = this.transform.scale.x, ns = increase*scale;
+        console.log(increase, scale)
         render.call(this, { scale: ns }, transition);
       },
       rotate: function(rotateangle, transition){
@@ -239,11 +240,6 @@
     }
 
     if(fn) fn.apply(new E(target), arg);
-
-    // if(fn){
-    //   fn.$ = fn.$ || new E(target);
-    //   fn.apply(fn.$, arg);
-    // }
   }
 
 
@@ -272,14 +268,24 @@
           index = starttouches[0].pageY < starttouches[1].pageY ? 0 : 1, direction = movetouches[index].pageX - starttouches[index].pageX >= 0 ? 1 : -1,
           rotate = direction * totalrotate;
 
-        if(!name) name = enabled('pinch') && enabled('rotate') ? (Math.abs(scale - 1) > 0.02 ? 'pinch' : 'rotate') : (enabled('pinch') ? 'pinch' : 'rotate');
+        if(!name){
+          if(enabled('pinch') && enabled('rotate')){
+            if(Math.abs(scale - 1) > 0.02) name = 'pinch';
+            else if(Math.abs(rotate) > 2) name = 'rotate';
+            else return;
+          }else{
+            name = enabled('pinch') ? 'pinch' : 'rotate';
+          }
+        }
+
+        //if(!name) name = enabled('pinch') && enabled('rotate') ? (Math.abs(scale - 1) > 0.01 ? 'pinch' : 'rotate') : (enabled('pinch') ? 'pinch' : 'rotate');
 
         if(name == 'pinch'){
-          if(!mark) mark = 1;
+          if(mark == undefined) mark = 1;
           moveInfo.scale = scale/mark;
           mark = scale;
         }else if(name == 'rotate'){
-          if(!mark) mark = 0;
+          if(mark == undefined) mark = 0;
           moveInfo.rotate = rotate - mark;
           mark = rotate;
         }
