@@ -266,11 +266,11 @@
           rotatelength = rotatelength0 + rotatelength1, rvalue = (startlength*startlength + movelength*movelength - rotatelength*rotatelength)/(2*startlength*movelength),
           rotate = Math.acos(rvalue < -1 ? -1 : (rvalue > 1 ? 1 : rvalue))/toradian,
           center = startInfo.center, stopindex = starttouches[0].pageY <= center.pageY ? 0 : 1;
-        if(!movetopindex) movetopindex = movetouches[0].pageY <= center.pageY ? 0 : 1
+        if(movetopindex == undefined) movetopindex = movetouches[0].pageY <= center.pageY ? 0 : 1
 
         if((movetouches[movetopindex].pageY <= center.pageY && movetouches[movetopindex].pageX < starttouches[stopindex].pageX) || (movetouches[movetopindex].pageY > center.pageY && movetouches[movetopindex].pageX < starttouches[stopindex == 0 ? 1 : 0].pageX)) rotate = -rotate;
 
-        document.getElementById('test').innerHTML = '4------mindex:' + movetopindex + '--sindex:' + stopindex;
+        document.getElementById('test').innerHTML = '5------mindex:' + movetopindex + '--sindex:' + stopindex;
 
         if(!name){
           if(enabled('pinch') && enabled('rotate')){
