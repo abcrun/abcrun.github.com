@@ -247,7 +247,7 @@
   var bindEvent = function(){
     var that = this, elm = this.element;
     var enabled = function(g){ return that.enabled.indexOf(g) > -1 };
-    var name, mark;
+    var name, mark, movetopindex;
 
     var calculate = function(){
       if(!startInfo || !moveInfo) return;
@@ -265,12 +265,12 @@
         var p1 = distance(movetouches[1], starttouches[1]), rotatelength0 = p0.length, rotatelength1 = p1.length,
           rotatelength = rotatelength0 + rotatelength1, rvalue = (startlength*startlength + movelength*movelength - rotatelength*rotatelength)/(2*startlength*movelength),
           rotate = Math.acos(rvalue < -1 ? -1 : (rvalue > 1 ? 1 : rvalue))/toradian,
-          center = startInfo.center, mtopindex = movetouches[0].pageY <= center.pageY ? 0 : 1,
-          stopindex = starttouches[0].pageY <= center.pageY ? 0 : 1;
+          center = startInfo.center, stopindex = starttouches[0].pageY <= center.pageY ? 0 : 1;
+        if(!movetopindex) movetopindex = movetouches[0].pageY <= center.pageY ? 0 : 1
 
-        if((movetouches[mtopindex].pageY <= center.pageY && movetouches[mtopindex].pageX < starttouches[stopindex].pageX) || (movetouches[mtopindex].pageY > center.pageY && movetouches[mtopindex].pageX < starttouches[stopindex == 0 ? 1 : 0].pageX)) rotate = -rotate;
+        if((movetouches[movetopindex].pageY <= center.pageY && movetouches[movetopindex].pageX < starttouches[stopindex].pageX) || (movetouches[movetopindex].pageY > center.pageY && movetouches[movetopindex].pageX < starttouches[stopindex == 0 ? 1 : 0].pageX)) rotate = -rotate;
 
-        document.getElementById('test').innerHTML = '3------mindex:' + mtopindex + '--sindex:' + stopindex;
+        document.getElementById('test').innerHTML = '4------mindex:' + movetopindex + '--sindex:' + stopindex;
 
         if(!name){
           if(enabled('pinch') && enabled('rotate')){
@@ -352,6 +352,7 @@
       isanimation = false;
       name = undefined;
       mark = undefined;
+      movetopindex = undefined;
 
       elm.removeEventListener(istouch ? 'touchmove' : 'mousemove', move, false);
       elm.removeEventListener(istouch ? 'touchend' : 'mouseup', end, false)
