@@ -270,7 +270,7 @@
 
         if((movetouches[movetopindex].pageY <= center.pageY && movetouches[movetopindex].pageX < starttouches[stopindex].pageX) || (movetouches[movetopindex].pageY > center.pageY && movetouches[movetopindex].pageX < starttouches[stopindex == 0 ? 1 : 0].pageX)) rotate = -rotate;
 
-        document.getElementById('test').innerHTML = '5------mindex:' + movetopindex + '--sindex:' + stopindex;
+        document.getElementById('test').innerHTML = '6------mindex:' + movetopindex + '--sindex:' + stopindex;
 
         if(!name){
           if(enabled('pinch') && enabled('rotate')){
@@ -316,10 +316,13 @@
 
 
     //addEvent
-    var startInfo, moveInfo, isanimation = false;
-    var start = function(e){
+    var startInfo, moveInfo, isanimation = false, die = function(e){
       e.preventDefault();
+      e.stopPropagation();
+    }
+    var start = function(e){
       startInfo = Evt(e);
+      die(e);
 
       trigger.call(that, 'start', startInfo, startInfo);
 
@@ -328,8 +331,8 @@
       elm.addEventListener(istouch ? 'touchcancel' : 'mouseleave', end, false);
     }
     var move = function(e){
-      e.preventDefault();
       moveInfo = Evt(e);
+      die(e);
 
       if(!isanimation && (enabled('slide') || enabled('roate') || enabled('pinch'))){
         animation(calculate);
@@ -339,6 +342,7 @@
 
     var end = function(e){
       e.preventDefault();
+      die(e);
       if(e.touches && e.touches.length != 0) return;
 
       var starttouches = startInfo.events, endInfo = Evt(e), endtouches = endInfo.events, endTime = endInfo.time, duration = endTime - startInfo.time;
