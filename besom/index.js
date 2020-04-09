@@ -269,6 +269,8 @@
 
         if((movetouches[topindex].pageY <= center.pageY && movetouches[topindex].pageX < starttouches[topindex].pageX) || (movetouches[topindex].pageY > center.pageY && movetouches[topindex].pageX < starttouches[topindex == 0 ? 1 : 0].pageX)) rotate = -rotate;
 
+        document.getElementById('test').innerHTML = '-----' + topindex;
+
         if(!name){
           if(enabled('pinch') && enabled('rotate')){
             if(Math.abs(scale - 1) > 0.02) name = 'pinch';
