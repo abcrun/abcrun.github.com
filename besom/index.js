@@ -119,7 +119,7 @@
           p = { x: point.pageX - o.left, y: point.pageY - o.top }, offsetx = origin.x - p.x, offsety = origin.y - p.y,
           point_origin_distance = Math.sqrt(offsetx*offsetx + offsety*offsety)/scale, angle = Math.atan(Math.abs(offsety/offsetx))/toradian, nx, ny;
 
-        if(offsety >= 0 && offsetx >= 0) toangle = angle - rotate;
+        if(offsety > 0 && offsetx > 0) toangle = angle - rotate;
         if(offsety > 0 && offsetx < 0) toangle = 180 - angle - rotate;
         if(offsety < 0 && offsetx > 0) toangle = angle + rotate;
         if(offsety < 0 && offsetx < 0) toangle = angle - rotate;
