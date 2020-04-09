@@ -247,15 +247,12 @@
   var bindEvent = function(){
     var that = this, elm = this.element;
     var enabled = function(g){ return that.enabled.indexOf(g) > -1 };
-    var name, mark, preMove;
+    var name, mark;
 
     var calculate = function(){
       if(!startInfo || !moveInfo) return;
 
-
       var starttouches = startInfo.events, movetouches = moveInfo.events, p0 = distance(starttouches[0], movetouches[0]);
-      if(!preMove) preMove = starttouches[0];
-
       if(startInfo.count == 1 && moveInfo.count == 1 && enabled('slide') && p0.length > 3){
         var offset = { x: p0.offsetx, y: p0.offsety };
         if(!mark) mark = { x: 0, y: 0 };
@@ -268,10 +265,10 @@
         var p1 = distance(movetouches[1], starttouches[1]), rotatelength0 = p0.length, rotatelength1 = p1.length,
           rotatelength = rotatelength0 + rotatelength1, rvalue = (startlength*startlength + movelength*movelength - rotatelength*rotatelength)/(2*startlength*movelength),
           rotate = Math.acos(rvalue < -1 ? -1 : (rvalue > 1 ? 1 : rvalue))/toradian,
-          center = startInfo.center, mcy = movetouches[0].pageY - center.pageY, mpx = movetouches[0].pageX - preMove.pageX;
-        if((mcy > 0 && mpx > 0) || (mcy < 0 && mpx < 0)) rotate = -rotate;
+          center = startInfo.center, topindex = movetouches.pageY <= center.pageY ? 0 : 1;
 
-        document.getElementById('test').innerHTML = '----' + f3(rotate) + '---mcy:' + f3(mcy) + '--mpx:' + f3(mpx);
+        if((movetouches[topindex].pageY <= center.pageY && movetouches[topindex].pageX < starttouches[topindex].pageX) || (movetouches[topindex].pageY > center.pageY && movetouches[topindex].pageX < starttouches[topindex == 0 ? 1 : 0].pageX)) rotate = -rotate;
+
         if(!name){
           if(enabled('pinch') && enabled('rotate')){
             if(Math.abs(scale - 1) > 0.02) name = 'pinch';
@@ -290,7 +287,6 @@
           if(mark == undefined) mark = 0;
           moveInfo.rotate = rotate - mark;
           mark = rotate;
-          preMove = movetouches[0];
         }
       }
 
@@ -353,7 +349,6 @@
       isanimation = false;
       name = undefined;
       mark = undefined;
-      preMove = undefined;
 
       elm.removeEventListener(istouch ? 'touchmove' : 'mousemove', move, false);
       elm.removeEventListener(istouch ? 'touchend' : 'mouseup', end, false)
