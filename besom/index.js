@@ -265,11 +265,12 @@
         var p1 = distance(movetouches[1], starttouches[1]), rotatelength0 = p0.length, rotatelength1 = p1.length,
           rotatelength = rotatelength0 + rotatelength1, rvalue = (startlength*startlength + movelength*movelength - rotatelength*rotatelength)/(2*startlength*movelength),
           rotate = Math.acos(rvalue < -1 ? -1 : (rvalue > 1 ? 1 : rvalue))/toradian,
-          center = startInfo.center, topindex = movetouches[0].pageY <= center.pageY ? 0 : 1;
+          center = startInfo.center, mtopindex = movetouches[0].pageY <= center.pageY ? 0 : 1,
+          stopindex = starttouches[0].pageY <= center.pageY ? 0 : 1;
 
-        if((movetouches[topindex].pageY <= center.pageY && movetouches[topindex].pageX < starttouches[topindex].pageX) || (movetouches[topindex].pageY > center.pageY && movetouches[topindex].pageX < starttouches[topindex == 0 ? 1 : 0].pageX)) rotate = -rotate;
+        if((movetouches[mtopindex].pageY <= center.pageY && movetouches[mtopindex].pageX < starttouches[stopindex].pageX) || (movetouches[mtopindex].pageY > center.pageY && movetouches[mtopindex].pageX < starttouches[stopindex == 0 ? 1 : 0].pageX)) rotate = -rotate;
 
-        document.getElementById('test').innerHTML = '2------' + topindex;
+        document.getElementById('test').innerHTML = '3------mindex:' + mtopindex + '--sindex:' + stopindex;
 
         if(!name){
           if(enabled('pinch') && enabled('rotate')){
