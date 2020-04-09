@@ -119,7 +119,7 @@
           p = { x: point.pageX - o.left, y: point.pageY - o.top }, offsetx = origin.x - p.x, offsety = origin.y - p.y,
           point_origin_distance = Math.sqrt(offsetx*offsetx + offsety*offsety)/scale, angle = Math.atan(Math.abs(offsety/offsetx))/toradian, nx, ny;
 
-        if(offsety > 0 && offsetx > 0) toangle = angle - rotate;
+        if(offsety >= 0 && offsetx >= 0) toangle = angle - rotate;
         if(offsety > 0 && offsetx < 0) toangle = 180 - angle - rotate;
         if(offsety < 0 && offsetx > 0) toangle = angle + rotate;
         if(offsety < 0 && offsetx < 0) toangle = angle - rotate;
@@ -247,7 +247,7 @@
   var bindEvent = function(){
     var that = this, elm = this.element;
     var enabled = function(g){ return that.enabled.indexOf(g) > -1 };
-    var name, mark, movetopindex;
+    var name, mark, movetopindex;//record the top point index when move
 
     var calculate = function(){
       if(!startInfo || !moveInfo) return;
@@ -269,8 +269,6 @@
         if(movetopindex == undefined) movetopindex = movetouches[0].pageY <= center.pageY ? 0 : 1
 
         if((movetouches[movetopindex].pageY <= center.pageY && movetouches[movetopindex].pageX < starttouches[stopindex].pageX) || (movetouches[movetopindex].pageY > center.pageY && movetouches[movetopindex].pageX < starttouches[stopindex == 0 ? 1 : 0].pageX)) rotate = -rotate;
-
-        document.getElementById('test').innerHTML = '6------mindex:' + movetopindex + '--sindex:' + stopindex;
 
         if(!name){
           if(enabled('pinch') && enabled('rotate')){
