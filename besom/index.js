@@ -265,7 +265,7 @@
       if(!startInfo || !moveInfo) return;
 
       var starttouches = startInfo.events, movetouches = moveInfo.events, p0 = distance(starttouches[0], movetouches[0]);
-      if(!preTouhces) preTouches = starttouches;
+      if(!preTouches) preTouches = starttouches;
 
       if(startInfo.count == 1 && moveInfo.count == 1 && enabled('slide') && p0.length > 3){
         var offset = { x: p0.offsetx, y: p0.offsety };
@@ -284,7 +284,7 @@
         if(d) rotate *= d;
         preTouches = movetouches;
 
-        document.getElementById('test').innerHTML = '1--d:' + d +  '--rotate:' + rotate;
+        document.getElementById('test').innerHTML = '2--d:' + d +  '--rotate:' + rotate;
 
         if(!name){
           if(enabled('pinch') && enabled('rotate')){
