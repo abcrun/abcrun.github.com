@@ -280,11 +280,11 @@
           rotatelength = rotatelength0 + rotatelength1, rvalue = (startlength*startlength + movelength*movelength - rotatelength*rotatelength)/(2*startlength*movelength),
           rotate = Math.acos(rvalue < -1 ? -1 : (rvalue > 1 ? 1 : rvalue))/toradian, d = direction(preTouches, movetouches);
 
-
-        if(d) rotate *= d;
+        if(!d) return;
+        rotate *= d;
         preTouches = movetouches;
 
-        document.getElementById('test').innerHTML = '3--d:' + d +  '--rotate:' + rotate;
+        document.getElementById('test').innerHTML = '4--d:' + d +  '--rotate:' + rotate;
 
         if(!name){
           if(enabled('pinch') && enabled('rotate')){
