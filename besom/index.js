@@ -247,12 +247,26 @@
   var bindEvent = function(){
     var that = this, elm = this.element;
     var enabled = function(g){ return that.enabled.indexOf(g) > -1 };
-    var name, mark, movetopindex;//record the top point index when move
+    var name, mark, preTouches;
+
+    //estimate the rotate direction
+    var direction = function(pre, next){
+      var d1 = distance(pre[0], next[0]), d2 = distance(pre[1], next[1]), d;
+      if(next[0].pageX > next1.pageX){
+        d = ((d1.offsetx >= 0 && d1.offsety <= 0) && (d2.offsetx <= 0 && d2.offsety >= 0)) || ((d1.offsetx <= 0 && d1.offsety <= 0) && (d2.offsetx >= 0 && d2.offsety >= 0)) ? -1 : 1;
+      }else if(next[1].pageX > next[0].pageX){
+        d = ((d2.offsetx >= 0 && d2.offsety <= 0) && (d1.offsetx <= 0 && d1.offsety >= 0)) || ((d2.offsetx <= 0 && d2.offsety <= 0) && (d1.offsetx >= 0 && d1.offsety >= 0)) ? -1 : 1;
+      }
+
+      return d;
+    }
 
     var calculate = function(){
       if(!startInfo || !moveInfo) return;
 
       var starttouches = startInfo.events, movetouches = moveInfo.events, p0 = distance(starttouches[0], movetouches[0]);
+      if(!preTouhces) preTouches = starttouches;
+
       if(startInfo.count == 1 && moveInfo.count == 1 && enabled('slide') && p0.length > 3){
         var offset = { x: p0.offsetx, y: p0.offsety };
         if(!mark) mark = { x: 0, y: 0 };
@@ -264,11 +278,13 @@
         var startlength = startInfo.length, movelength = moveInfo.length, toradian = Math.PI/180, scale = movelength/startlength;
         var p1 = distance(movetouches[1], starttouches[1]), rotatelength0 = p0.length, rotatelength1 = p1.length,
           rotatelength = rotatelength0 + rotatelength1, rvalue = (startlength*startlength + movelength*movelength - rotatelength*rotatelength)/(2*startlength*movelength),
-          rotate = Math.acos(rvalue < -1 ? -1 : (rvalue > 1 ? 1 : rvalue))/toradian,
-          center = startInfo.center, stopindex = starttouches[0].pageY <= center.pageY ? 0 : 1;
-        if(movetopindex == undefined) movetopindex = movetouches[0].pageY <= center.pageY ? 0 : 1
+          rotate = Math.acos(rvalue < -1 ? -1 : (rvalue > 1 ? 1 : rvalue))/toradian, d = direction(preTouches, movetouches);
 
-        if((movetouches[movetopindex].pageY <= center.pageY && movetouches[movetopindex].pageX < starttouches[stopindex].pageX) || (movetouches[movetopindex].pageY > center.pageY && movetouches[movetopindex].pageX < starttouches[stopindex == 0 ? 1 : 0].pageX)) rotate = -rotate;
+
+        if(d) rotate *= d;
+        preTouches = movetouches;
+
+        document.getElementById('test').innerHTML = '1--d:' + d +  '--rotate:' + rotate;
 
         if(!name){
           if(enabled('pinch') && enabled('rotate')){
@@ -319,8 +335,8 @@
       e.stopPropagation();
     }
     var start = function(e){
-      startInfo = Evt(e);
       die(e);
+      startInfo = Evt(e);
 
       trigger.call(that, 'start', startInfo, startInfo);
 
@@ -329,8 +345,8 @@
       elm.addEventListener(istouch ? 'touchcancel' : 'mouseleave', end, false);
     }
     var move = function(e){
-      moveInfo = Evt(e);
       die(e);
+      moveInfo = Evt(e);
 
       if(!isanimation && (enabled('slide') || enabled('roate') || enabled('pinch'))){
         animation(calculate);
@@ -339,9 +355,8 @@
     }
 
     var end = function(e){
-      e.preventDefault();
-      die(e);
       if(e.touches && e.touches.length != 0) return;
+      die(e);
 
       var starttouches = startInfo.events, endInfo = Evt(e), endtouches = endInfo.events, endTime = endInfo.time, duration = endTime - startInfo.time;
       endInfo.duration = duration;
@@ -354,7 +369,7 @@
       isanimation = false;
       name = undefined;
       mark = undefined;
-      movetopindex = undefined;
+      preTouches = undefined;
 
       elm.removeEventListener(istouch ? 'touchmove' : 'mousemove', move, false);
       elm.removeEventListener(istouch ? 'touchend' : 'mouseup', end, false)
@@ -370,7 +385,6 @@
     this.element = elm || document.body;
     this.events = {};
     this.enabled = [ 'tap' ]; //default
-    this.current = null; //current gesture
 
     this.element.setAttribute('__gid', rootgid);
     this.__evtfn = bindEvent.call(this);//return event function in order to destroy
@@ -427,3 +441,4 @@
   };
 
 });
+
