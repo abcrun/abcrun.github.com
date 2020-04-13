@@ -252,7 +252,7 @@
     //estimate the rotate direction
     var direction = function(pre, next){
       var d1 = distance(pre[0], next[0]), d2 = distance(pre[1], next[1]), d;
-      if(next[0].pageX > next1.pageX){
+      if(next[0].pageX > next[1].pageX){
         d = ((d1.offsetx >= 0 && d1.offsety <= 0) && (d2.offsetx <= 0 && d2.offsety >= 0)) || ((d1.offsetx <= 0 && d1.offsety <= 0) && (d2.offsetx >= 0 && d2.offsety >= 0)) ? -1 : 1;
       }else if(next[1].pageX > next[0].pageX){
         d = ((d2.offsetx >= 0 && d2.offsety <= 0) && (d1.offsetx <= 0 && d1.offsety >= 0)) || ((d2.offsetx <= 0 && d2.offsety <= 0) && (d1.offsetx >= 0 && d1.offsety >= 0)) ? -1 : 1;
@@ -284,7 +284,7 @@
         if(d) rotate *= d;
         preTouches = movetouches;
 
-        document.getElementById('test').innerHTML = '2--d:' + d +  '--rotate:' + rotate;
+        document.getElementById('test').innerHTML = '3--d:' + d +  '--rotate:' + rotate;
 
         if(!name){
           if(enabled('pinch') && enabled('rotate')){
