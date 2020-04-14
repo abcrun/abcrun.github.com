@@ -279,7 +279,7 @@
         var p1 = distance(movetouches[1], starttouches[1]), rotatelength0 = p0.length, rotatelength1 = p1.length,
           rotatelength = rotatelength0 + rotatelength1, rvalue = (startlength*startlength + movelength*movelength - rotatelength*rotatelength)/(2*startlength*movelength),
           totalrotate = Math.acos(rvalue < -1 ? -1 : (rvalue > 1 ? 1 : rvalue))/toradian, rotate,
-          topindex = movetouches[0].pageY < movetouches[1].pageY ? 0 : (movetouches[0].pageY < movetouches[1].pageY ? 1 : undefined), bottomindex = topindex == 0 ? 1 : (topindex == 1 ? 0 : undefined);
+          topindex = movetouches[0].pageY < movetouches[1].pageY ? 0 : (movetouches[0].pageY > movetouches[1].pageY ? 1 : undefined), bottomindex = topindex == 0 ? 1 : (topindex == 1 ? 0 : undefined);
 
         if(topindex != undefined){
           if(movetouches[topindex].pageX < preTouches[topindex].pageX || movetouches[bottomindex].pageX > preTouches[bottomindex].pageX) rotate = -totalrotate;
@@ -287,7 +287,7 @@
         }
         preTouches = movetouches;
 
-        document.getElementById('test').innerHTML = '6-------topbottom:' +  topindex +  '##' + bottomindex +  '-----rotate:' + rotate;
+        document.getElementById('test').innerHTML = '7-------:' +  topindex +  '##' + bottomindex +  '-----rotate:' + rotate;
 
         if(!name){
           if(enabled('pinch') && enabled('rotate')){
