@@ -278,13 +278,16 @@
         var startlength = startInfo.length, movelength = moveInfo.length, toradian = Math.PI/180, scale = movelength/startlength;
         var p1 = distance(movetouches[1], starttouches[1]), rotatelength0 = p0.length, rotatelength1 = p1.length,
           rotatelength = rotatelength0 + rotatelength1, rvalue = (startlength*startlength + movelength*movelength - rotatelength*rotatelength)/(2*startlength*movelength),
-          rotate = Math.acos(rvalue < -1 ? -1 : (rvalue > 1 ? 1 : rvalue))/toradian,
-          topindex = movetouches[0].pageY < movetouches[1].pageY ? 0 : 1, bottomindex = topindex == 0 ? 1 : 0;
+          totalrotate = Math.acos(rvalue < -1 ? -1 : (rvalue > 1 ? 1 : rvalue))/toradian, rotate,
+          topindex = movetouches[0].pageY < movetouches[1].pageY ? 0 : (movetouches[0].pageY < movetouches[1].pageY ? 1 : undefined), bottomindex = topindex == 0 ? 1 : (topindex == 1 ? 0 : undefined);
 
-        if(movetouches[topindex].pageX < preTouches[topindex].pageX || movetouches[bottomindex].pageX > preTouches[bottomindex].pageX) rotate = -rotate;
+        if(topindex != undefined){
+          if(movetouches[topindex].pageX < preTouches[topindex].pageX || movetouches[bottomindex].pageX > preTouches[bottomindex].pageX) rotate = -totalrotate;
+          else if(movetouches[topindex].pageX > preTouches[topindex].pageX || movetouches[bottomindex].pageX < preTouches[bottomindex].pageX) rotate = totalrotate
+        }
         preTouches = movetouches;
 
-        document.getElementById('test').innerHTML = '5-------:' + rotate;
+        document.getElementById('test').innerHTML = '6-------topbottom:' +  topindex +  '##' + bottomindex +  '-----rotate:' + rotate;
 
         if(!name){
           if(enabled('pinch') && enabled('rotate')){
@@ -300,7 +303,7 @@
           if(mark == undefined) mark = 1;
           moveInfo.scale = scale/mark;
           mark = scale;
-        }else if(name == 'rotate'){
+        }else if(name == 'rotate' && rotate != undefined){
           if(mark == undefined) mark = 0;
           moveInfo.rotate = rotate - mark;
           mark = rotate;
