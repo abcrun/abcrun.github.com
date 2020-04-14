@@ -247,7 +247,7 @@
   var bindEvent = function(){
     var that = this, elm = this.element;
     var enabled = function(g){ return that.enabled.indexOf(g) > -1 };
-    var name, mark, preTouches;
+    var name, mark, topindex, preTouches;
 
     //estimate the rotate direction
     var direction = function(pre, next){
@@ -265,7 +265,10 @@
       if(!startInfo || !moveInfo) return;
 
       var starttouches = startInfo.events, movetouches = moveInfo.events, p0 = distance(starttouches[0], movetouches[0]);
-      if(!preTouches) preTouches = starttouches;
+      if(!preTouches){
+        preTouches = starttouches;
+        topindex = starttouches.pageY < starttouches.pageY ? 0 : (starttouches.pageY > starttouches.pageY ? 1 : undefined);
+      }
 
       if(startInfo.count == 1 && moveInfo.count == 1 && enabled('slide') && p0.length > 3){
         var offset = { x: p0.offsetx, y: p0.offsety };
@@ -278,16 +281,16 @@
         var startlength = startInfo.length, movelength = moveInfo.length, toradian = Math.PI/180, scale = movelength/startlength;
         var p1 = distance(movetouches[1], starttouches[1]), rotatelength0 = p0.length, rotatelength1 = p1.length,
           rotatelength = rotatelength0 + rotatelength1, rvalue = (startlength*startlength + movelength*movelength - rotatelength*rotatelength)/(2*startlength*movelength),
-          totalrotate = Math.acos(rvalue < -1 ? -1 : (rvalue > 1 ? 1 : rvalue))/toradian, rotate,
-          topindex = movetouches[0].pageY < movetouches[1].pageY ? 0 : (movetouches[0].pageY > movetouches[1].pageY ? 1 : undefined), bottomindex = topindex == 0 ? 1 : (topindex == 1 ? 0 : undefined);
+          totalrotate = Math.acos(rvalue < -1 ? -1 : (rvalue > 1 ? 1 : rvalue))/toradian, rotate;
 
-        if(topindex != undefined){
-          if(movetouches[topindex].pageX < preTouches[topindex].pageX || movetouches[bottomindex].pageX > preTouches[bottomindex].pageX) rotate = -totalrotate;
-          else if(movetouches[topindex].pageX > preTouches[topindex].pageX || movetouches[bottomindex].pageX < preTouches[bottomindex].pageX) rotate = totalrotate
-        }
+        if(topindex == undefined) topindex = movetouches[0].pageY < movetouches[1].pageY ? 0 : 1;
+        var bottomindex = topindex == 0 ? 1 : 0;
+
+        if(movetouches[topindex].pageX < preTouches[topindex].pageX || movetouches[bottomindex].pageX > preTouches[bottomindex].pageX) rotate = -totalrotate;
+        else if(movetouches[topindex].pageX > preTouches[topindex].pageX || movetouches[bottomindex].pageX < preTouches[bottomindex].pageX) rotate = totalrotate
         preTouches = movetouches;
 
-        document.getElementById('test').innerHTML = '7-------:' +  topindex +  '##' + bottomindex +  '-----rotate:' + rotate;
+        document.getElementById('test').innerHTML = '8-------:' +  topindex +  '##' + bottomindex +  '-----rotate:' + rotate;
 
         if(!name){
           if(enabled('pinch') && enabled('rotate')){
@@ -373,6 +376,7 @@
       name = undefined;
       mark = undefined;
       preTouches = undefined;
+      topindex = undefined;
 
       elm.removeEventListener(istouch ? 'touchmove' : 'mousemove', move, false);
       elm.removeEventListener(istouch ? 'touchend' : 'mouseup', end, false)
