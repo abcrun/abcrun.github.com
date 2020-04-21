@@ -271,7 +271,7 @@
         if(!name){
           if(enabled('pinch') && enabled('rotate')){
             if(Math.abs(scale - 1) > 0.02) name = 'pinch';
-            else if(Math.abs(rotate) > 2) name = 'rotate';
+            else if(Math.abs(rotate) > 1) name = 'rotate';
             else return;
           }else{
             name = enabled('pinch') ? 'pinch' : 'rotate';
