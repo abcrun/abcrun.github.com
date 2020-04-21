@@ -247,7 +247,7 @@
   var bindEvent = function(){
     var that = this, elm = this.element;
     var enabled = function(g){ return that.enabled.indexOf(g) > -1 };
-    var name, mark, topindex, preTouches;
+    var name, mark;
 
     var calculate = function(){
       if(!startInfo || !moveInfo) return;
@@ -269,11 +269,8 @@
         var startlength = startInfo.length, movelength = moveInfo.length, toradian = Math.PI/180, scale = movelength/startlength;
         var p1 = distance(movetouches[1], starttouches[1]), rotatelength0 = p0.length, rotatelength1 = p1.length,
           rotatelength = rotatelength0 + rotatelength1, rvalue = (startlength*startlength + movelength*movelength - rotatelength*rotatelength)/(2*startlength*movelength),
-          totalrotate = Math.acos(rvalue < -1 ? -1 : (rvalue > 1 ? 1 : rvalue))/toradian, rotate;
-        var center = startInfo.center, start = starttouches[0], end = movetouches[0], ds = distance(center, start), de = distance(center, end),
-          direction = ds.offsetx * de.offsety - ds.offsety * de.offsetx;
+          rotate = Math.acos(rvalue < -1 ? -1 : (rvalue > 1 ? 1 : rvalue))/toradian;
 
-        document.getElementById('test').innerHTML = '11-------direction:' +  direction;
         if(!name){
           if(enabled('pinch') && enabled('rotate')){
             if(Math.abs(scale - 1) > 0.02) name = 'pinch';
@@ -290,8 +287,15 @@
           mark = scale;
         }else if(name == 'rotate' && rotate != undefined){
           if(mark == undefined) mark = 0;
+
+          var center = startInfo.center, start = starttouches[0], end = movetouches[0], ds = distance(center, start), de = distance(center, end),
+            direction = ds.offsetx * de.offsety - ds.offsety * de.offsetx;
+          rotate = direction < 0 ? -rotate : rotate;
+
           moveInfo.rotate = rotate - mark;
           mark = rotate;
+
+          document.getElementById('test').innerHTML = '12-------direction:' +  direction;
         }
       }
 
@@ -357,8 +361,6 @@
       isanimation = false;
       name = undefined;
       mark = undefined;
-      preTouches = undefined;
-      topindex = undefined;
 
       elm.removeEventListener(istouch ? 'touchmove' : 'mousemove', move, false);
       elm.removeEventListener(istouch ? 'touchend' : 'mouseup', end, false)
