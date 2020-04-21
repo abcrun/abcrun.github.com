@@ -249,10 +249,6 @@
     var enabled = function(g){ return that.enabled.indexOf(g) > -1 };
     var name, mark, topindex, preTouches;
 
-    //estimate the rotate direction
-    var direction = function(pre, next){
-    }
-
     var calculate = function(){
       if(!startInfo || !moveInfo) return;
 
@@ -274,12 +270,10 @@
         var p1 = distance(movetouches[1], starttouches[1]), rotatelength0 = p0.length, rotatelength1 = p1.length,
           rotatelength = rotatelength0 + rotatelength1, rvalue = (startlength*startlength + movelength*movelength - rotatelength*rotatelength)/(2*startlength*movelength),
           totalrotate = Math.acos(rvalue < -1 ? -1 : (rvalue > 1 ? 1 : rvalue))/toradian, rotate;
+        var center = startInfo.center, start = starttouches[0], end = movetouches[0], ds = distance(center, start), de = distance(center, end),
+          direction = ds.offsetx * de.offsety - ds.offsety * de.offsetx;
 
-        startIndex = starttouches[0].pageY < starttouches[1].pageY ? 0 : 1;
-        moveIndex = movetouches[0].pageY < movetouches[1].pageY ? 0 : 1;
-
-        document.getElementById('test').innerHTML = '10-------starttop:' +  startIndex +  '##moveIndex:' + moveIndex +  '-----rotate:' + rotate;
-
+        document.getElementById('test').innerHTML = '11-------direction:' +  direction;
         if(!name){
           if(enabled('pinch') && enabled('rotate')){
             if(Math.abs(scale - 1) > 0.02) name = 'pinch';
@@ -350,7 +344,6 @@
 
     var end = function(e){
       if(e.touches && e.touches.length != 0) return;
-      alert('1111111111111')
       die(e);
 
       var starttouches = startInfo.events, endInfo = Evt(e), endtouches = endInfo.events, endTime = endInfo.time, duration = endTime - startInfo.time;
