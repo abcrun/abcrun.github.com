@@ -193,7 +193,6 @@
       time:new Date().getTime(),
       count: touches.length,
       events: touches,
-      points: [ {pageX: touches[0].pageX, pageY: touches[0].pageY} ]
     };
 
     if(touches.length == 2){
@@ -202,7 +201,6 @@
         top = finger1.pageY + y/2, left = finger1.pageX + (x < 0 ? -offsetx : offsetx);
 
       infos.length = length;
-      infos.points.push({pageX: touches[1].pageX, pageY: touches[1].pageY});
       infos.center = { pageX: left, pageY: top };
     }
 
@@ -252,7 +250,7 @@
     var calculate = function(){
       if(!startInfo || !moveInfo) return;
 
-      var starttouches = startInfo.points, movetouches = moveInfo.points, p0 = distance(starttouches[0], movetouches[0]);
+      var starttouches = startInfo.events, movetouches = moveInfo.events, p0 = distance(starttouches[0], movetouches[0]);
       if(startInfo.count == 1 && moveInfo.count == 1 && enabled('slide') && p0.length > 3){
         var offset = { x: p0.offsetx, y: p0.offsety };
         if(!mark) mark = { x: 0, y: 0 };
@@ -290,7 +288,9 @@
           moveInfo.rotate = rotate - mark;
           mark = rotate;
 
-          document.getElementById('test').innerHTML = '16:direction' +  direction + 'start:' + JSON.stringify(starttouches);
+
+          document.getElementById('test').innerHTML = '17:direction' +  direction + 'start:' + JSON.stringify(starttouches);
+          if(isNaN(direction)) alert(JSON.stringify(startInfo))
         }
       }
 
