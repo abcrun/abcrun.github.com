@@ -278,7 +278,7 @@
         startIndex = starttouches[0].pageY < starttouches[1].pageY ? 0 : 1;
         moveIndex = movetouches[0].pageY < movetouches[1].pageY ? 0 : 1;
 
-        document.getElementById('test').innerHTML = '9-------starttop:' +  startindex +  '##moveIndex:' + moveIndex +  '-----rotate:' + rotate;
+        document.getElementById('test').innerHTML = '9-------starttop:' +  startIndex +  '##moveIndex:' + moveIndex +  '-----rotate:' + rotate;
 
         if(!name){
           if(enabled('pinch') && enabled('rotate')){
