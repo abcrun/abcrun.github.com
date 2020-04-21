@@ -285,13 +285,11 @@
             s1 = starttouches[1], e1 = movetouches[1], ds1 = distance(center, s1), de1 = distance(center, e1),
             d0 = ds0.offsetx * de0.offsety - ds0.offsety * de0.offsetx, d1 = ds1.offsetx * de1.offsety - ds1.offsety * de1.offsetx;
 
-          // if(direction == 0) return;
-          // else rotate = direction < 0 ? -rotate : rotate;
-
+          rotate = (d0 < 0 || d1 < 0) ? -rotate : rotate;
           moveInfo.rotate = rotate - mark;
           mark = rotate;
 
-          document.getElementById('test').innerHTML = '23##d0' +  d0 + '##d1:' + d1;
+          document.getElementById('test').innerHTML = '24##d0' +  d0 + '##d1:' + d1;
         }
       }
 
