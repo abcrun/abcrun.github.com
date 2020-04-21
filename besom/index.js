@@ -289,7 +289,7 @@
           mark = rotate;
 
 
-          document.getElementById('test').innerHTML = '17:direction' +  direction + 'start:' + JSON.stringify(starttouches);
+          document.getElementById('test').innerHTML = '18:direction' +  direction + 'center:' + JSON.stringify(startInfo.center);
           if(isNaN(direction)) alert(JSON.stringify(startInfo))
         }
       }
