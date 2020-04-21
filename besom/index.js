@@ -200,7 +200,7 @@
         offsetx = Math.sqrt(length*length/4 - y*y/4),
         top = finger1.pageY + y/2, left = finger1.pageX + (x < 0 ? -offsetx : offsetx);
 
-      if(typeof left == 'null') alert(finger1.pageX, finger2.pageX)
+      if(left == 'null') alert(finger1.pageX, finger2.pageX)
 
       infos.length = length;
       infos.center = { pageX: left, pageY: top };
@@ -292,7 +292,7 @@
           moveInfo.rotate = rotate - mark;
           mark = rotate;
 
-          document.getElementById('test').innerHTML = '20:direction' +  direction + 'center:' + JSON.stringify(startInfo.center);
+          document.getElementById('test').innerHTML = '21:direction' +  direction + 'center:' + JSON.stringify(startInfo.center);
         }
       }
 
