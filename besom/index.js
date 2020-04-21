@@ -183,7 +183,7 @@
     return {
       offsetx: x,
       offsety: y,
-      length: parseInt(Math.sqrt(x*x + y*y))
+      length: Math.sqrt(x*x + y*y)
     }
   }
 
@@ -199,8 +199,6 @@
       var finger1 = touches[0], finger2 = touches[1], d = distance(finger1, finger2), x = d.offsetx, y = d.offsety, length = d.length,
         offsetx = Math.sqrt(length*length/4 - y*y/4),
         top = finger1.pageY + y/2, left = finger1.pageX + (x < 0 ? -offsetx : offsetx);
-
-      if(left == null) alert(finger1.pageX, finger2.pageX)
 
       infos.length = length;
       infos.center = { pageX: left, pageY: top };
@@ -283,16 +281,17 @@
         }else if(name == 'rotate' && rotate != undefined){
           if(mark == undefined) mark = 0;
 
-          var center = startInfo.center, start = starttouches[0], end = movetouches[0], ds = distance(center, start), de = distance(center, end),
-            direction = ds.offsetx * de.offsety - ds.offsety * de.offsetx;
+          var center = startInfo.center,s0 = starttouches[0], e0 = movetouches[0], ds0 = distance(center, s0), de0 = distance(center, e0),
+            s1 = starttouches[1], e1 = movetouches[1], ds1 = distance(center, s1), de1 = distance(center, e1),
+            d0 = ds0.offsetx * de0.offsety - ds0.offsety * de0.offsetx, d1 = ds1.offsetx * de1.offsety - ds1.offsety * de1.offsetx;
 
-          if(direction == 0) return;
-          else rotate = direction < 0 ? -rotate : rotate;
+          // if(direction == 0) return;
+          // else rotate = direction < 0 ? -rotate : rotate;
 
           moveInfo.rotate = rotate - mark;
           mark = rotate;
 
-          document.getElementById('test').innerHTML = '22:direction' +  direction + 'center:' + JSON.stringify(startInfo.center);
+          document.getElementById('test').innerHTML = '23##d0' +  d0 + '##d1:' + d1;
         }
       }
 
