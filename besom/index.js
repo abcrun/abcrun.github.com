@@ -253,11 +253,6 @@
       if(!startInfo || !moveInfo) return;
 
       var starttouches = startInfo.events, movetouches = moveInfo.events, p0 = distance(starttouches[0], movetouches[0]);
-      if(!preTouches){
-        preTouches = starttouches;
-        topindex = starttouches.pageY < starttouches.pageY ? 0 : (starttouches.pageY > starttouches.pageY ? 1 : undefined);
-      }
-
       if(startInfo.count == 1 && moveInfo.count == 1 && enabled('slide') && p0.length > 3){
         var offset = { x: p0.offsetx, y: p0.offsety };
         if(!mark) mark = { x: 0, y: 0 };
@@ -295,7 +290,7 @@
           moveInfo.rotate = rotate - mark;
           mark = rotate;
 
-          document.getElementById('test').innerHTML = '12-------direction:' +  direction;
+          document.getElementById('test').innerHTML = '13-------direction:' +  direction;
         }
       }
 
