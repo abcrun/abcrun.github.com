@@ -251,14 +251,6 @@
 
     //estimate the rotate direction
     var direction = function(pre, next){
-      var d1 = distance(pre[0], next[0]), d2 = distance(pre[1], next[1]), d;
-      if(next[0].pageX > next[1].pageX){
-        d = ((d1.offsetx >= 0 && d1.offsety <= 0) && (d2.offsetx <= 0 && d2.offsety >= 0)) || ((d1.offsetx <= 0 && d1.offsety <= 0) && (d2.offsetx >= 0 && d2.offsety >= 0)) ? -1 : 1;
-      }else if(next[1].pageX > next[0].pageX){
-        d = ((d2.offsetx >= 0 && d2.offsety <= 0) && (d1.offsetx <= 0 && d1.offsety >= 0)) || ((d2.offsetx <= 0 && d2.offsety <= 0) && (d1.offsetx >= 0 && d1.offsety >= 0)) ? -1 : 1;
-      }
-
-      return d;
     }
 
     var calculate = function(){
@@ -283,14 +275,10 @@
           rotatelength = rotatelength0 + rotatelength1, rvalue = (startlength*startlength + movelength*movelength - rotatelength*rotatelength)/(2*startlength*movelength),
           totalrotate = Math.acos(rvalue < -1 ? -1 : (rvalue > 1 ? 1 : rvalue))/toradian, rotate;
 
-        if(topindex == undefined) topindex = movetouches[0].pageY < movetouches[1].pageY ? 0 : 1;
-        var bottomindex = topindex == 0 ? 1 : 0;
+        startIndex = starttouches[0].pageY < starttouches[1].pageY ? 0 : 1;
+        moveIndex = movetouches[0].pageY < movetouches[1].pageY ? 0 : 1;
 
-        if(movetouches[topindex].pageX < preTouches[topindex].pageX || movetouches[bottomindex].pageX > preTouches[bottomindex].pageX) rotate = -totalrotate;
-        else if(movetouches[topindex].pageX > preTouches[topindex].pageX || movetouches[bottomindex].pageX < preTouches[bottomindex].pageX) rotate = totalrotate
-        preTouches = movetouches;
-
-        document.getElementById('test').innerHTML = '8-------:' +  topindex +  '##' + bottomindex +  '-----rotate:' + rotate;
+        document.getElementById('test').innerHTML = '9-------starttop:' +  startindex +  '##moveIndex:' + moveIndex +  '-----rotate:' + rotate;
 
         if(!name){
           if(enabled('pinch') && enabled('rotate')){
@@ -362,6 +350,7 @@
 
     var end = function(e){
       if(e.touches && e.touches.length != 0) return;
+      alert('1111111111111')
       die(e);
 
       var starttouches = startInfo.events, endInfo = Evt(e), endtouches = endInfo.events, endTime = endInfo.time, duration = endTime - startInfo.time;
