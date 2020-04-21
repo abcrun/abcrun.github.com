@@ -290,7 +290,7 @@
           moveInfo.rotate = rotate - mark;
           mark = rotate;
 
-          document.getElementById('test').innerHTML = '15:direction' +  direction + 'start:' + JSON.parse(starttouches);
+          document.getElementById('test').innerHTML = '16:direction' +  direction + 'start:' + JSON.stringify(starttouches);
         }
       }
 
