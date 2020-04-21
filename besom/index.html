@@ -27,7 +27,7 @@
     <script charset="utf-8" src="./index.js?25"></script>
     <script charset="utf-8">
       var g = Besom.create(document.getElementById('demo'));
-      g.enable('longtap', 'slide', 'rotate');
+      g.enable('longtap', 'slide', 'pinch', 'rotate');
 
       g.on('tap', function(e, a){ 
         var origin = this.getPointOrigin(e.points[0])
