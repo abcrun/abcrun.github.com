@@ -30,7 +30,8 @@
       g.enable('longtap', 'slide', 'pinch', 'rotate');
 
       g.on('tap', function(e, a){ 
-        var origin = this.getPointOrigin(e.points[0])
+        var origin = this.getPointOrigin(e.events[0])
+        console.log(origin)
       })
       g.on('longtap', function(e){ console.log('parent longtap', e) })
 
