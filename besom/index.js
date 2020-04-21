@@ -200,6 +200,8 @@
         offsetx = Math.sqrt(length*length/4 - y*y/4),
         top = finger1.pageY + y/2, left = finger1.pageX + (x < 0 ? -offsetx : offsetx);
 
+      if(!left) alert(finger1.pageX, finger2.pageX)
+
       infos.length = length;
       infos.center = { pageX: left, pageY: top };
     }
@@ -283,14 +285,14 @@
 
           var center = startInfo.center, start = starttouches[0], end = movetouches[0], ds = distance(center, start), de = distance(center, end),
             direction = ds.offsetx * de.offsety - ds.offsety * de.offsetx;
-          rotate = direction < 0 ? -rotate : rotate;
+
+          if(direction == 0) return;
+          else rotate = direction < 0 ? -rotate : rotate;
 
           moveInfo.rotate = rotate - mark;
           mark = rotate;
 
-
-          document.getElementById('test').innerHTML = '18:direction' +  direction + 'center:' + JSON.stringify(startInfo.center);
-          if(isNaN(direction)) alert(JSON.stringify(startInfo))
+          document.getElementById('test').innerHTML = '19:direction' +  direction + 'center:' + JSON.stringify(startInfo.center);
         }
       }
 
