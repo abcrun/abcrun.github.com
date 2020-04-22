@@ -118,10 +118,6 @@
           origin = transform.origin, scale = transform.scale.x, rotate = transform.rotate, tx = json.translate.x, ty = json.translate.y,
           p = { x: point.pageX - o.left, y: point.pageY - o.top }, offsetx = origin.x - p.x, offsety = origin.y - p.y;
 
-        //I am a little lazy
-        offsetx = (offsetx == 0 ? .1 : offsetx)
-        offsety = (offsety == 0 ? .1 : offsety)
-
         var point_origin_distance = Math.sqrt(offsetx*offsetx + offsety*offsety)/scale, angle = Math.atan(Math.abs(offsety/offsetx))/toradian, nx, ny;
         if(offsety > 0 && offsetx > 0) toangle = angle - rotate;
         if(offsety > 0 && offsetx < 0) toangle = 180 - angle - rotate;
