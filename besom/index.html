@@ -23,19 +23,20 @@
       <img class="pic" src="./demo.png" />
     </div>
 
-    <h3>tap/doubletap/slide/rotate</h3>
-    <div id="slide-rotate">
-      <img class="pic" src="./demo.png" />
-    </div>
+    <!-- <h3>tap/doubletap/slide/rotate</h3> -->
+    <!-- <div id="slide-rotate"> -->
+    <!--   <img class="pic" src="./demo.png" /> -->
+    <!-- </div> -->
 
-    <h3>deletate with tap/longtap/slide/pinch</h3>
-    <div id="delegate">
-      <span class="span span1">Top tap/longtap/slide</span>
-      <span class="span span2">bottom tap/longtap/slide</span>
-      <img class="pic" src="./demo.png" style="width:200px; height: 200px;" />
-    </div>
+    <!-- <h3>deletate with tap/longtap/slide/pinch</h3> -->
+    <!-- <div id="delegate"> -->
+    <!--   <span class="span span1">Top tap/longtap/slide</span> -->
+    <!--   <span class="span span2">bottom tap/longtap/slide</span> -->
+    <!--   <img class="pic" src="./demo.png" style="width:200px; height: 200px;" /> -->
+    <!-- </div> -->
 
-    <script charset="utf-8" src="https://cdn.jsdelivr.net/npm/besom/dist/besom.min.js"></script>
+    <!-- <script charset="utf-8" src="https://cdn.jsdelivr.net/npm/besom/dist/besom.min.js"></script> -->
+    <script charset="utf-8" src="./index.js"></script>
     <script charset="utf-8">
       var e1 = document.getElementById('slide-pinch'), e2 = document.getElementById('slide-rotate'), e3 = document.getElementById('delegate'),
         g1 = Besom.create(e1), g2 = Besom.create(e2), g3 = Besom.create(e3);
@@ -63,7 +64,7 @@
       g3.delegate('.span', 'longtap', function(){ alert('span longtap') })
       g3.delegate('.span', 'slide', function(currentEvt){ this.translate(currentEvt.translate) });
       g3.delegate('.pic', 'tap', function(){ alert('pic tap') });
-      g2.delegate('.pic', 'start', function(currentEvt){ if(currentEvt.counts == 2) this.setPointAsOrigin(currentEvt.center) })
+      g3.delegate('.pic', 'start', function(currentEvt){ if(currentEvt.counts == 2) this.setPointAsOrigin(currentEvt.center) })
       g3.delegate('.pic', 'slide', function(currentEvt){ this.translate(currentEvt.translate) });
       g3.delegate('.pic', 'pinch', function(currentEvt){ this.scale(currentEvt.scale) });
 
