@@ -25,18 +25,32 @@ export default class PeerConnection {
 
   watchPeerConnection() {
     // 监听P2P连接
-    this.pc.addEventListener('connectionstatechange', () => {
+    this.pc.onconnectionstatechange = () => {
       console.log('P2P连接状态变化:', this.pc.connectionState);
-    });
+    };
 
     // 监听收集 ICE 候选地址
-    this.pc.addEventListener('icecandidate', (event) => {
+    this.pc.onicecandidate = (event) => {
       if (event.candidate) {
         console.log('新 ICE 候选地址:', event.candidate);
       } else {
         console.log('ICE 候选地址收集完毕');
       }
-    });
+    };
+
+    // 需要进行新的信令交换以建立或更新连接时触发 - 可以在此事件中调用 createOffer 或 createAnswer 来发起新的 SDP
+    this.pc.onnegotiationneeded = () => {
+      console.log('需要进行新的信令交换');
+    };
+
+    // 当信令状态发生变化时触发。信令状态指的是连接的信令通道的不同状态（例如，stable, have-local-offer 等）
+    this.pc.onsignalingstatechange = () => {
+      console.log('信令状态变化:', this.pc.signalingState);
+    };
+
+    this.pc.oniceconnectionstatechange = () => {
+      console.log('ICE连接状态变化:', this.pc.iceConnectionState);
+    };
   }
 
   watchSignallingMessages() {
@@ -75,7 +89,34 @@ export default class PeerConnection {
   }
 
   closeConnection() {
+    // 1. 停止所有发送器
+    this.pc.getSenders().forEach(sender => {
+      if (sender.track) {
+        sender.track.stop();
+        sender.replaceTrack(null); // 移除track引用
+      }
+    });
+
+    // 2. 移除所有接收器处理
+    this.pc.getReceivers().forEach(receiver => {
+      if (receiver.track) receiver.track.stop();
+    });
+
+    // 3. 关闭连接
     this.pc.close();
+
+    // 4. 清理事件监听器
+    this.pc.onconnectionstatechange = null;
+    this.pc.oniceconnectionstatechange = null;
+    this.pc.onsignalingstatechange = null;
+    this.pc.onnegotiationneeded = null;
+    this.pc.onicecandidate = null;
+
+    // 5. 设置为null帮助GC
+    setTimeout(() => {
+      this.pc = null;
+    }, 0);
+
     this.localStream.getTracks().forEach((track) => track.stop());
     this.remoteStream.getTracks().forEach((track) => track.stop());
   }
