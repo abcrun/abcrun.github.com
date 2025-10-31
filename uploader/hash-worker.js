@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-globals */
-import xxhash from 'xxhash-wasm';
+import xxhash from "xxhash-wasm";
 
 function readFileChunk(chunk) {
   return new Promise((resolve, reject) => {
@@ -43,10 +43,11 @@ self.onmessage = async (event) => {
 
   try {
     const hasher = await xxhash();
+    console.log("1111111");
     const hash = await calculateFileHash(hasher, file, size);
 
-    self.postMessage({ status: 'success', hash });
+    self.postMessage({ status: "success", hash });
   } catch (error) {
-    self.postMessage({ status: 'error', error: error.message });
+    self.postMessage({ status: "error", error: error.message });
   }
 };
