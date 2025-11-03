@@ -23,100 +23,44 @@ function blobToArrayBuffer(blob) {
   });
 }
 
+var uuid = function () {
+  if (
+    typeof crypto !== "undefined" &&
+    typeof crypto.randomUUID === "function"
+  ) {
+    return crypto.randomUUID();
+  }
+
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+    var r = (Math.random() * 16) | 0;
+    var v = c === "x" ? r : (r & 0x3) | 0x8; // 0x3 -> 0b0011 16(0b1111)以内的数与其或运算，可以将数组限定在[0-3]之间，0x8 -> 1000 [0-3]以内的整数与其位运算，可以将数组限定在[8-11]之间，即8/9/a/b
+    return v.toString(16);
+  });
+};
+
 export default class UploadManager {
   S3Client = null;
 
-  bucket = "panda-private";
+  bucket = "xxx";
 
-  maxChunkSize = 5 * 1024 * 1024;
-  // maxChunkSize = 1 * 1024;
+  maxChunkSize = 10 * 1024 * 1024;
 
   maxConcurrentUploads = 5;
 
-  waiting = [];
+  files = [];
 
-  inprogress = [];
-
-  completed = [];
-
-  error = [];
+  inprogress = []; // 记录正在上传的文件
 
   constructor() {
     this.S3Client = new S3Client({
-      endpoint: "xxxx",
-      region: "us-east-1",
+      endpoint: "xxx",
+      region: "xxx",
       credentials: {
-        accessKeyId: "xxxx",
-        secretAccessKey: "xxxxx",
+        accessKeyId: "xxx",
+        secretAccessKey: "xxx",
       },
       forcePathStyle: true,
     });
-  }
-
-  async add(files) {
-    files.forEach((file) => {
-      const record = this.createRecord(file);
-      this.schedule(record, "waiting");
-    });
-
-    this.upload();
-  }
-
-  stop(record) {
-    record.disabled = true;
-    record.inprogress = [];
-    record.completed = [];
-
-    this.inprogress.splice(this.inprogress.indexOf(record), 1); // 从 inprogress 中移除
-    if (this.waiting.length) {
-      this.upload();
-    }
-
-    this.schedule(record, "waiting"); // 将record放入waiting队列
-  }
-
-  async start(record) {
-    record.disabled = false;
-    await this.listMultipartUploads(record); // 获取record completed parts
-
-    if (!this.inprogress.length) {
-      this.upload();
-    }
-  }
-
-  delete(record) {
-    // 无差别删除
-    this.waiting.splice(this.waiting.indexOf(record), 1);
-    this.inprogress.splice(this.inprogress.indexOf(record), 1);
-    this.completed.splice(this.completed.indexOf(record), 1);
-    this.error.splice(this.error.indexOf(record), 1);
-  }
-
-  log(record, status) {
-    console.log(record.key, status);
-  }
-
-  schedule(record, status) {
-    switch (status) {
-      case "waiting":
-        this.waiting.push(record);
-        break;
-      case "inprogress":
-        this.inprogress.push(record);
-        break;
-      case "completed":
-        this.inprogress.splice(this.inprogress.indexOf(record), 1);
-        this.completed.push(record);
-        break;
-      case "error":
-        this.inprogress.splice(this.inprogress.indexOf(record), 1);
-        this.error.push(record);
-        break;
-      default:
-        break;
-    }
-
-    this.log(record, status);
   }
 
   async listMultipartUploads(record) {
@@ -134,11 +78,11 @@ export default class UploadManager {
     }));
   }
 
-  async createFileUploadId(record) {
+  async createFileUploadId(file) {
     const createRes = await this.S3Client.send(
       new CreateMultipartUploadCommand({
         Bucket: this.bucket,
-        Key: record.key,
+        Key: file.key,
       })
     );
 
@@ -147,18 +91,19 @@ export default class UploadManager {
 
   createRecord(file) {
     const now = new Date().getTime();
-    const key = `${now}-${file.size}/${file.name}`;
+    const uid = uuid().replace(/-/g, "");
+    const key = `${uid}_${now}_${file.size}/${file.name}`;
 
     const chunks = Math.ceil(file.size / this.maxChunkSize);
     const record = {
-      file,
+      key,
       uploadId: "",
       hash: "",
-      key,
+      status: "waiting", // waiting || inprogress || completed || merged || error || stopped || deleted  completed代表完成所有的分片上传  merged 代表合并完成
       chunks,
-      disabled: false,
-      inprogress: [], // 记录正在上传的part
-      completed: [],
+      inprogress: [], // 记录正在上传的partNumber
+      completed: [], // 记录已经上传完成的分片数据 { partNumber, ETag }
+      raw: file,
     };
 
     return record;
@@ -182,12 +127,124 @@ export default class UploadManager {
     return record;
   }
 
-  createChunk(record, partNumber) {
-    const { uploadId, file } = record;
+  add(files) {
+    files.forEach((file) => {
+      const record = this.createRecord(file);
+      record.keyIndex = this.files.length;
+
+      this.files.push(record);
+    });
+
+    if (!this.inprogress.length) this.start();
+  }
+
+  async start(file) {
+    if (file) file.status = "waiting"; // 将 file 添加到等待上传队列，比如：文件从 stopped 状态变为可以上传
+
+    const inprogressChunks = this.inprogress.reduce((total, current) => {
+      return current.inprogress.length + total;
+    }, 0);
+    if (inprogressChunks >= this.maxConcurrentUploads) return;
+
+    // 如果没有正在上传的文件，则开始上传新的文件
+    if (!this.inprogress.length) {
+      this.uploadNewFile();
+    } else {
+      // 获取最新的正在上传的文件
+      const latestInprogressFile = this.inprogress[this.inprogress.length - 1];
+      const { inprogress, completed, chunks } = latestInprogressFile;
+
+      // 如果还有未完成的分片，则继续上传 -> 当completed.length === chunks 时需要首先执行合并
+      if (inprogress.length + completed.length <= chunks) {
+        this.uploadChunk(latestInprogressFile);
+      } else {
+        this.uploadNewFile();
+      }
+    }
+  }
+
+  stop(uploadId) {
+    const file = this.files.find((file) => file.uploadId === uploadId);
+    if (!file) return;
+
+    file.status = "stopped";
+    this.inprogress.splice(this.inprogress.indexOf(file), 1);
+  }
+
+  delete(uploadId) {
+    const file = this.files.find((file) => file.uploadId === uploadId);
+    if (!file) return;
+
+    file.status = "deleted"; // 标记为已删除，理论上如果已经上传了应该删除存储桶的文件，未上传所有分片的也应该删除存储桶的分片数据
+    this.inprogress.splice(this.inprogress.indexOf(file), 1);
+  }
+
+  async uploadNewFile() {
+    const file = this.files.find((file) => file.status === "waiting");
+    if (!file) return;
+
+    this.inprogress.push(file);
+    file.status = "inprogress";
+
+    // 新文件没有uploadId；
+    // 暂停并重新开启的文件或历史记录中未上传完成的文件已经包含了uploadId
+    if (!file.uploadId) {
+      const uploadId = await this.createFileUploadId(file);
+      file.uploadId = uploadId;
+    }
+
+    console.log(
+      `上传文件：${file.key}，对应的uploadId为${file.uploadId}，文件被分成${file.chunks}个切片，历史上传chunk数为${file.completed.length}`
+    );
+
+    this.uploadChunk(file);
+  }
+
+  async uploadChunk(file) {
+    if (file.status !== "inprogress") return; // error or stopped
+
+    const { chunks, completed, inprogress } = file;
+
+    // 如果某个文件所有分片上传完成了，但是在merge之前被暂停了，此时当重新启用上传时，应该直接合并
+    if (completed.length === chunks) {
+      this.mergeChunks(file);
+      return;
+    }
+
+    const completedParts = completed.map((part) => part.PartNumber);
+    const inprogressChunks = this.inprogress.reduce((total, current) => {
+      return current.inprogress.length + total;
+    }, 0);
+    const availableChunks = this.maxConcurrentUploads - inprogressChunks;
+
+    console.log(`当前可用并发数为：${availableChunks}`);
+
+    const allParts = Array.from({ length: chunks }, (_, i) => i + 1);
+    const availableChunksArray = allParts
+      .filter(
+        (number) =>
+          !inprogress.includes(number) && !completedParts.includes(number)
+      )
+      .slice(0, availableChunks);
+
+    for (let i = 0; i < availableChunksArray.length; i += 1) {
+      const partNumber = availableChunksArray[i];
+      const chunkInfo = this.createChunk(file, partNumber);
+
+      this.handleUpload(chunkInfo, file);
+    }
+
+    if (availableChunksArray.length < availableChunks) {
+      this.uploadNewFile();
+    }
+  }
+
+  createChunk(file, partNumber) {
+    const { uploadId, raw } = file;
 
     const start = (partNumber - 1) * this.maxChunkSize;
-    const end = Math.min(partNumber * this.maxChunkSize, file.size);
-    const chunk = file.slice(start, end);
+    const end = Math.min(partNumber * this.maxChunkSize, raw.size);
+    const chunk = raw.slice(start, end);
 
     const chunkInfo = {
       uploadId,
@@ -198,125 +255,70 @@ export default class UploadManager {
     return chunkInfo;
   }
 
-  async upload() {
-    const record = this.waiting.shift();
-    this.schedule(record, "inprogress");
-
-    // 新上传的文件没有uploadId, 缓存离线记载的record，已经包含了uploadId
-    if (!record.uploadId) {
-      const uploadId = await this.createFileUploadId(record);
-      record.uploadId = uploadId;
-    }
-
-    const { chunks, completed, inprogress } = record;
-    const completedParts = completed.map((part) => part.PartNumber);
-    const inprogressChunks = this.inprogress.reduce((total, current) => {
-      return current.inprogress.length + total;
-    }, 0);
-    const availableChunks = this.maxConcurrentUploads - inprogressChunks;
-
-    console.log(
-      `上传文件：${record.key}，对应的uploadId为${record.uploadId}，文件被分成${chunks}个切片，当前可用的并发切片数是${availableChunks}`
-    );
-
-    const allParts = Array.from({ length: chunks }, (_, i) => i + 1);
-    const availableChunksArray = allParts
-      .filter(
-        (number) =>
-          !inprogress.includes(number) && !completedParts.includes(number)
-      )
-      .slice(0, Math.min(availableChunks, chunks));
-
-    for (let i = 0; i < availableChunksArray.length; i += 1) {
-      const partNumber = availableChunksArray[i];
-      const chunkInfo = this.createChunk(record, partNumber);
-      this.handleUpload(chunkInfo, record);
-    }
-  }
-
-  async uploadNextChunk(record) {
-    if (record.disabled) return; // 暂停上传
-
-    if (this.error.includes(record) || !this.inprogress.includes(record))
-      return; // 出错或者取消上传
-
-    const { chunks, inprogress, completed } = record;
-    const completedParts = completed.map((part) => part.PartNumber);
-
-    const allParts = Array.from({ length: chunks }, (_, i) => i + 1);
-
-    const nextPartNumber = allParts.find(
-      (number) =>
-        !inprogress.includes(number) && !completedParts.includes(number)
-    );
-
-    if (nextPartNumber) {
-      const chunkInfo = this.createChunk(record, nextPartNumber);
-      await this.handleUpload(chunkInfo, record);
-    }
-  }
-
-  async handleUpload(chunkInfo, record) {
-    if (record.disabled) return; // 暂停上传
+  async handleUpload(chunkInfo, file) {
+    if (file.status !== "inprogress") return;
 
     const { partNumber, chunk } = chunkInfo;
-    record.inprogress.push(partNumber);
+    file.inprogress.push(partNumber);
 
-    console.log(`开始上传${record.key}: ${partNumber}/${record.chunks}`);
-
+    console.log(`开始上传${file.key}: ${partNumber}/${file.chunks}`);
     try {
       const buffer = await blobToArrayBuffer(chunk);
       const uploadPartRes = await this.S3Client.send(
         new UploadPartCommand({
           Bucket: this.bucket,
-          Key: record.key,
-          UploadId: record.uploadId,
+          Key: file.key,
+          UploadId: file.uploadId,
           PartNumber: partNumber,
           Body: buffer,
           ContentLength: buffer.byteLength,
         })
       );
 
-      record.inprogress.splice(record.inprogress.indexOf(partNumber), 1);
-      record.completed.push({
+      file.inprogress.splice(file.inprogress.indexOf(partNumber), 1);
+      file.completed.push({
         ETag: uploadPartRes.ETag,
         PartNumber: partNumber,
       });
 
-      if (record.completed.length === record.chunks) {
-        this.handleMerge(record);
+      if (file.completed.length === file.chunks) {
+        file.status = "completed";
+        this.handleMerge(file);
       } else {
-        this.uploadNextChunk(record);
+        this.uploadChunk(file);
       }
     } catch (error) {
-      this.schedule(record, "error");
+      file.status = "error";
+      console.log("handleUpload error:", error);
     }
   }
 
-  async handleMerge(record) {
-    if (record.disabled) return; // 暂停上传
+  async handleMerge(file) {
+    if (file.status !== "completed") return;
 
+    console.log(`开始合并文件：${file.key}，对应的uploadId为${file.uploadId}`);
     try {
       await this.S3Client.send(
         new CompleteMultipartUploadCommand({
           Bucket: this.bucket,
-          Key: record.key,
-          UploadId: record.uploadId,
+          Key: file.key,
+          UploadId: file.uploadId,
           MultipartUpload: {
-            Parts: record.completed.sort((a, b) => a.PartNumber - b.PartNumber),
+            Parts: file.completed.sort((a, b) => a.PartNumber - b.PartNumber),
           },
         })
       );
 
-      record.completed = [];
-      this.schedule(record, "completed");
+      console.log(
+        `合并文件成功：${file.key}，对应的uploadId为${file.uploadId}`
+      );
+      file.completed = [];
+      this.inprogress.splice(this.inprogress.indexOf(file), 1); // 移除正在进行中的文件
 
-      if (this.waiting.length) {
-        this.upload();
-      }
+      this.uploadNewFile();
     } catch (error) {
-      console.log(error);
-      this.schedule(record, "error");
+      file.status = "error";
+      console.log("handleMerge error:", error);
     }
   }
 }
